@@ -170,26 +170,30 @@
 
         .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjusts the minimum width of the columns */
-            gap: 30px; /* Increases the gap between modules for better spacing */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* More flexible column sizing */
+            gap: 20px; /* Adjusted gap for better spacing on all devices */
             padding: 20px;
-            margin-top: 20px; /* Ensures space between search bar and modules */
+            margin-top: 20px;
             align-items: start;
         }
 
         .module {
             background-color: #ffffff;
-            padding: 20px;
+            padding: 15px; /* Adjusted padding for better space utilization */
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
-            transition: background-color 0.3s, color 0.3s; /* Smooth transition for background and text color */
+            transition: background-color 0.3s, color 0.3s;
             color: #333; /* Default text color */
         }
 
         .module:hover {
             background-color: #007bff; /* Change background color on hover */
             color: #ffffff; /* Change text color on hover for better visibility */
+        }
+
+        .module:hover p, .module:hover h3, .module:hover a {
+            color: #ffffff; /* Ensures all text including paragraphs, headings, and links turn white on hover */
         }
 
         .module a {
@@ -205,6 +209,17 @@
         @media (max-width: 768px) {
             .module-grid {
                 grid-template-columns: 1fr; /* Single column layout on smaller screens */
+            }
+
+            .module {
+                padding: 10px; /* Smaller padding for tighter spaces */
+            }
+        }
+
+        /* Additional responsiveness for very small devices */
+        @media (max-width: 480px) {
+            .module {
+                font-size: 14px; /* Smaller text within modules for readability */
             }
         }
 
@@ -329,11 +344,81 @@
                 font-size: 14px; /* Smaller text within modules for readability */
             }
         }
+
+        /* Specific styles for Aerospace and Automotive modules */
+        .module[data-field="aerospace"], .module[data-field="automotive"] {
+            position: sticky; /* Makes the module sticky */
+            top: 20px; /* Distance from the top when scrolling */
+            z-index: 20; /* Higher z-index to ensure visibility over other content */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Enhanced shadow for better visibility */
+        }
+
+        @media (max-width: 768px) {
+            .module[data-field="aerospace"], .module[data-field="automotive"] {
+                top: 10px; /* Adjust top spacing for smaller screens */
+            }
+        }
+
+        /* Additional responsive adjustments for very small devices */
+        @media (max-width: 480px) {
+            .module[data-field="aerospace"], .module[data-field="automotive"] {
+                top: 5px; /* Further adjust top spacing for very small screens */
+            }
+        }
+
+        #site-nav {
+            background-color: transparent; /* Set background to transparent */
+            padding: 10px 20px; /* Padding around the nav links */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth, optional */
+        }
+
+        #site-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Center the navigation links horizontally */
+        }
+
+        #site-nav ul li {
+            padding: 0 15px; /* Horizontal padding between nav items */
+        }
+
+        #site-nav ul li a {
+            text-decoration: none;
+            color: #ffffff; /* Change font color to white */
+            font-weight: bold;
+        }
+
+        #site-nav ul li a:hover {
+            color: #cccccc; /* Lighter grey on hover for better interaction feedback */
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments for the navigation bar */
+        @media (max-width: 768px) {
+            #site-nav ul {
+                flex-direction: column; /* Stack the navigation items vertically on smaller screens */
+                align-items: center;
+            }
+
+            #site-nav ul li {
+                padding: 10px 0; /* Adjust padding for vertical layout */
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <!-- Header now only contains necessary elements if any -->
+        <nav id="site-nav">
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#research-fields">Research Fields</a></li>
+                <li><a href="#featured-research">Featured Research</a></li>
+                <li><a href="#industry-modules">Industry Applications</a></li>
+            </ul>
+        </nav>
+        <!-- Other header elements if any -->
     </header>
 
     <main>
