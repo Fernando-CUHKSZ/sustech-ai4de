@@ -1,0 +1,320 @@
+:root {
+    --primary-color: #007AFF;
+    --secondary-color: #5AC8FA;
+    --background-color: #F2F2F7;
+    --text-color: #1C1C1E;
+    --gradient-start: #007AFF;
+    --gradient-end: #5AC8FA;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+main {
+    position: relative;
+}
+
+/* Header and Navigation */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: transparent;
+}
+
+#main-nav ul {
+    display: flex;
+    justify-content: flex-end;
+    list-style-type: none;
+    padding: 1rem 2rem;
+    margin: 0;
+}
+
+#main-nav li {
+    margin-left: 2rem;
+}
+
+#main-nav a {
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Dark text for light backgrounds */
+header.dark-text #main-nav a {
+    color: #1C1C1E;
+}
+
+/* Light text for dark backgrounds */
+header.light-text #main-nav a {
+    color: white;
+}
+
+/* Hero Section */
+#hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 2;
+    color: white;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+    transition: background 0.5s ease;
+}
+
+/* Search Container */
+.search-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+#search-bar {
+    width: 60%;
+    max-width: 600px;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 25px 0 0 25px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    color: var(--text-color); /* Default text color */
+}
+
+#search-bar::placeholder {
+    color: rgba(0, 0, 0, 0.5); /* Default placeholder color */
+    transition: color 0.3s ease;
+}
+
+#search-bar:focus {
+    background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+    color: white; /* Text color when focused */
+}
+
+#search-bar:focus::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Placeholder color when focused */
+}
+
+#search-button {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 0 25px 25px 0;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#search-button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Research Fields */
+#research-fields {
+    padding: 4rem 2rem;
+    background: linear-gradient(180deg, var(--background-color), #ffffff);
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.module {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease, color 0.3s ease; /* Added color transition */
+    cursor: pointer;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(50px);
+    color: var(--text-color); /* Default text color */
+}
+
+.module.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.module:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary-color);
+    color: white; /* Text color on hover */
+}
+
+.module-details {
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.module:hover .module-details {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Featured Research */
+#featured-research {
+    padding: 4rem 2rem;
+    background: linear-gradient(0deg, var(--background-color), #ffffff);
+}
+
+.research-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 2rem 0;
+    gap: 2rem;
+}
+
+.research-card {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    scroll-snap-align: start;
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: translateX(50px);
+    display: flex;
+    flex-direction: column;
+}
+
+.research-card.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.research-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.research-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.research-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+/* Back to Top Button */
+#back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+#back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .module-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #search-bar {
+        width: 80%;
+    }
+
+    .research-slider {
+        flex-direction: column;
+    }
+
+    .research-card {
+        flex: 0 0 auto;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Smooth section transitions */
+.active-section {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Parallax effect */
+.parallax {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
