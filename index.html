@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin Research Literature Database</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .search-container {
+            max-width: 600px;
+            margin: 20px auto 0; /* Adds top margin to space it from the title */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers the search form */
+        }
+
+        .search-input-group {
+            width: 100%; /* Ensures the search bar fills the container */
+            display: flex;
+            justify-content: center;
+        }
+
+        #search-bar {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+        }
+
+        #search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .search-input-group {
+                flex-direction: column;
+            }
+
+            #search-bar {
+                width: 100%;
+                border-right: 2px solid #ccc;
+                border-radius: 4px;
+                margin-bottom: 10px;
+            }
+
+            #search-button {
+                width: 100%;
+                border-radius: 4px;
+            }
+        }
+
+        .header-logo, .footer-logo {
+            height: 150px; /* Further increased size from 120px to 150px */
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .header-top, .footer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: transparent; /* Keeps the background transparent */
+            font-size: 0.9em;
+        }
+
+        footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa; /* Light background for the footer */
+            clear: both; /* Clear floats if any */
+            position: relative; /* Ensures footer is positioned relative to its normal flow */
+            z-index: 10; /* Ensures footer is above other content if overlapping */
+        }
+
+        .footer-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px; /* Space between logo/text and the navigation */
+        }
+
+        .footer-logo {
+            height: 100px; /* Adjusted for better fit */
+            margin-bottom: 10px; /* Space between logo and powered by text */
+        }
+
+        footer p, footer a {
+            margin: 5px 0;
+            font-size: 0.9em; /* Slightly larger font size for better readability */
+            color: #333; /* Darker text for better contrast */
+        }
+
+        footer a {
+            color: #007bff; /* Bootstrap primary blue for links */
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .footer-logo {
+                height: 80px; /* Smaller logo on mobile */
+            }
+
+            #main-nav ul {
+                flex-direction: column; /* Stack nav items vertically on small screens */
+            }
+
+            #main-nav ul li {
+                padding: 10px 0; /* Adjust padding for vertical layout */
+            }
+        }
+
+        /* Navigation styles */
+        #main-nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        #main-nav ul li {
+            padding: 0 15px; /* Reduced padding for a tighter nav */
+        }
+
+        #main-nav ul li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        #main-nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Ensure the logo is not hidden by any overflow settings */
+        body, html {
+            overflow-x: hidden; /* Hide horizontal overflow */
+            position: relative; /* Ensures proper stacking context */
+            min-height: 100%; /* Ensure full height */
+        }
+
+        main {
+            padding-bottom: 100px; /* Add space at the bottom of the main content */
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* More flexible column sizing */
+            gap: 20px; /* Adjusted gap for better spacing on all devices */
+            padding: 20px;
+            margin-top: 20px;
+            align-items: start;
+        }
+
+        .module {
+            background-color: #ffffff;
+            padding: 15px; /* Adjusted padding for better space utilization */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            color: #333; /* Default text color */
+        }
+
+        .module:hover {
+            background-color: #007bff; /* Change background color on hover */
+            color: #ffffff; /* Change text color on hover for better visibility */
+        }
+
+        .module:hover p, .module:hover h3, .module:hover a {
+            color: #ffffff; /* Ensures all text including paragraphs, headings, and links turn white on hover */
+        }
+
+        .module a {
+            color: #007bff; /* Initial link color */
+            text-decoration: none;
+        }
+
+        .module a:hover {
+            color: #ffffff; /* Ensures link color is also visible on hover */
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .module-grid {
+                grid-template-columns: 1fr; /* Single column layout on smaller screens */
+            }
+
+            .module {
+                padding: 10px; /* Smaller padding for tighter spaces */
+            }
+        }
+
+        /* Additional responsiveness for very small devices */
+        @media (max-width: 480px) {
+            .module {
+                font-size: 14px; /* Smaller text within modules for readability */
+            }
+        }
+
+        .module-section {
+            padding: 20px;
+            background-color: #f4f4f4; /* Light grey background for the section */
+        }
+
+        .module h3 {
+            margin-top: 0;
+        }
+
+        .module p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .module a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff; /* Initial link color */
+            text-decoration: none;
+        }
+
+        .module a:hover {
+            color: #ffffff; /* Ensures link color is also visible on hover */
+            text-decoration: underline;
+        }
+
+        .suggestive-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .suggestive-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .suggestive-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        .hero-content {
+            text-align: center; /* Centers the content */
+            padding: 20px; /* Adds padding for spacing */
+        }
+
+        /* Base styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Responsive adjustments for smaller devices */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 24px; /* Smaller font size for the main title */
+            }
+
+            .search-container {
+                padding: 10px;
+                margin-top: 10px;
+            }
+
+            .search-input-group {
+                flex-direction: column;
+            }
+
+            #search-bar, #search-button {
+                width: 100%;
+                margin-bottom: 10px; /* Adds margin for stacked elements */
+            }
+
+            #search-button {
+                border-radius: 4px;
+            }
+
+            .module-grid {
+                grid-template-columns: 1fr; /* Single column layout for modules */
+            }
+
+            .module {
+                padding: 15px; /* Smaller padding within modules */
+            }
+
+            .suggestive-buttons button {
+                padding: 8px 16px; /* Smaller buttons */
+                font-size: 14px; /* Smaller font size for buttons */
+            }
+
+            .footer-logo {
+                height: 60px; /* Smaller logo in the footer */
+            }
+
+            #main-nav ul {
+                flex-direction: column;
+                align-items: center; /* Center alignment for nav items */
+            }
+
+            #main-nav ul li {
+                padding: 5px; /* Smaller padding for nav items */
+            }
+        }
+
+        /* Additional responsiveness for very small devices */
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 20px; /* Even smaller font size for the main title */
+            }
+
+            .module {
+                font-size: 14px; /* Smaller text within modules for readability */
+            }
+        }
+
+        /* Specific styles for Aerospace and Automotive modules */
+        .module[data-field="aerospace"], .module[data-field="automotive"] {
+            position: sticky; /* Makes the module sticky */
+            top: 20px; /* Distance from the top when scrolling */
+            z-index: 20; /* Higher z-index to ensure visibility over other content */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Enhanced shadow for better visibility */
+        }
+
+        @media (max-width: 768px) {
+            .module[data-field="aerospace"], .module[data-field="automotive"] {
+                top: 10px; /* Adjust top spacing for smaller screens */
+            }
+        }
+
+        /* Additional responsive adjustments for very small devices */
+        @media (max-width: 480px) {
+            .module[data-field="aerospace"], .module[data-field="automotive"] {
+                top: 5px; /* Further adjust top spacing for very small screens */
+            }
+        }
+
+        #site-nav {
+            background-color: transparent; /* Set background to transparent */
+            padding: 10px 20px; /* Padding around the nav links */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth, optional */
+        }
+
+        #site-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* Center the navigation links horizontally */
+        }
+
+        #site-nav ul li {
+            padding: 0 15px; /* Horizontal padding between nav items */
+        }
+
+        #site-nav ul li a {
+            text-decoration: none;
+            color: #ffffff; /* Change font color to white */
+            font-weight: bold;
+        }
+
+        #site-nav ul li a:hover {
+            color: #cccccc; /* Lighter grey on hover for better interaction feedback */
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments for the navigation bar */
+        @media (max-width: 768px) {
+            #site-nav ul {
+                flex-direction: column; /* Stack the navigation items vertically on smaller screens */
+                align-items: center;
+            }
+
+            #site-nav ul li {
+                padding: 10px 0; /* Adjust padding for vertical layout */
+            }
+        }
+
+        #graph-container {
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            width: 100%;
+            height: 600px;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 120px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .x-dt-buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .x-dt-buttons button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="site-nav">
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#research-fields">Research Fields</a></li>
+                <li><a href="#featured-research">Featured Research</a></li>
+                <li><a href="#industry-modules">Industry Applications</a></li>
+            </ul>
+        </nav>
+        <!-- Other header elements if any -->
+    </header>
+
+    <main>
+        <section id="hero" class="parallax" data-speed="0.5">
+            <div class="hero-content">
+                <h1>Digital Twin Research Literature Database</h1>
+                <div class="search-container">
+                    <form id="search-form" action="https://scholar.google.com/scholar" method="get" target="_blank">
+                        <div class="search-input-group">
+                            <input type="text" id="search-bar" name="q" placeholder="Search digital twin research...">
+                            <button type="submit" id="search-button">Search</button>
+                        </div>
+                    </form>
+                    <div class="suggestive-buttons">
+                        <button onclick="window.open('https://scholar.google.com/scholar?q=Digital+Twin+in+Aerospace', '_blank')">Aerospace</button>
+                        <button onclick="window.open('https://scholar.google.com/scholar?q=Digital+Twin+in+Manufacturing', '_blank')">Manufacturing</button>
+                        <button onclick="window.open('https://scholar.google.com/scholar?q=Digital+Twin+in+Healthcare', '_blank')">Healthcare</button>
+                        <button onclick="window.open('https://scholar.google.com/scholar?q=Digital+Twin+in+Energy', '_blank')">Energy</button>
+                        <button onclick="window.open('https://scholar.google.com/scholar?q=Digital+Twin+in+Smart+Cities', '_blank')">Smart Cities</button>
+                    </div>
+                </div>
+                <div id="search-filters" class="hidden">
+                    <!-- Filters will be added dynamically with JavaScript -->
+                </div>
+            </div>
+            <div class="hero-background"></div>
+        </section>
+
+        <section id="research-fields" class="parallax" data-speed="0.2">
+            <h2>Explore Digital Twin Research Fields</h2>
+            <div class="module-grid">
+                <div class="module" data-field="aerospace" data-keywords="Aerospace+Digital+Twin">
+                    <h3>Aerospace + Digital Twin</h3>
+                    <p>Revolutionizing aircraft design and maintenance</p>
+                    <div class="module-details">
+                        <p class="key-insight">Key Insight: 30% increase in maintenance efficiency</p>
+                        <div class="animated-graphic">
+                            <!-- Animated graphic or mini video will be added here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="module" data-field="automotive" data-keywords="Automotive+Manufacturing+Digital+Twin">
+                    <h3>Automotive Manufacturing + Digital Twin</h3>
+                    <p>Optimizing production and performance</p>
+                    <div class="module-details">
+                        <p class="key-insight">Key Insight: 25% reduction in production time</p>
+                        <div class="animated-graphic">
+                            <!-- Animated graphic or mini video will be added here -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Add more modules for other fields -->
+            </div>
+        </section>
+
+        <section id="featured-research" class="parallax" data-speed="0.1">
+            <h2>Featured Research</h2>
+            <div class="research-slider">
+                <div class="research-card" data-keywords="Healthcare+Digital+Twins">
+                    <h3>Healthcare and Digital Twins</h3>
+                    <p>Revolutionizing patient care and medical training</p>
+                    <!-- Add more content as needed -->
+                </div>
+                <div class="research-card" data-keywords="Smart+Cities+Digital+Twin">
+                    <h3>Smart Cities and Digital Twins</h3>
+                    <p>Optimizing urban planning and resource management</p>
+                    <!-- Add more content as needed -->
+                </div>
+                <!-- Add more research cards as needed -->
+            </div>
+        </section>
+
+        <section id="industry-modules" class="module-section">
+            <h2>Digital Twin Applications by Industry</h2>
+            <div class="module-grid">
+                <!-- Aerospace Module -->
+                <div class="module">
+                    <h3>Aerospace</h3>
+                    <p>Review of digital twin applications in the aviation industry.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Automotive Manufacturing Module -->
+                <div class="module">
+                    <h3>Automotive Manufacturing</h3>
+                    <p>Digital twin concepts in manufacturing industries - a literature review and avenues for further research.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Construction Module -->
+                <div class="module">
+                    <h3>Construction</h3>
+                    <p>Review of digital twin applications in construction, focusing on design, operation, and lifecycle management.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Healthcare Module -->
+                <div class="module">
+                    <h3>Healthcare</h3>
+                    <p>Digital twin in the pharmaceutical industry, highlighting various applications such as drug development and patient care.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Smart Cities Module -->
+                <div class="module">
+                    <h3>Smart Cities</h3>
+                    <p>Digital twin technology in smart cities, focusing on infrastructure management and urban development.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Industry 4.0 Module -->
+                <div class="module">
+                    <h3>Industry 4.0</h3>
+                    <p>Application of digital twin for maintenance and optimization in industrial operations.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Manufacturing Module -->
+                <div class="module">
+                    <h3>Manufacturing</h3>
+                    <p>Unit-level digital twin applications for production and process optimization.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Energy and Power Generation Module -->
+                <div class="module">
+                    <h3>Energy and Power Generation</h3>
+                    <p>Digital twin for predictive maintenance and optimization in power generation plants.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <!-- Additional Industries from the Second List -->
+                <div class="module">
+                    <h3>Oil and Gas</h3>
+                    <p>Tools and technologies for Digital Twins in the oil and gas industry.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <div class="module">
+                    <h3>Fluid Mechanics</h3>
+                    <p>Integrating neural networks and digital twins for experimental fluid mechanics applications.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <div class="module">
+                    <h3>Building Industry</h3>
+                    <p>Digital twin-enabled predictive maintenance in the building and construction industry.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <div class="module">
+                    <h3>Supply Chain Management</h3>
+                    <p>Role of simulation and Digital Twins in supply chain optimization.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <div class="module">
+                    <h3>Packaging</h3>
+                    <p>Application of Digital Twin in modeling paper-aluminum laminates for sustainable packaging.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+                <div class="module">
+                    <h3>Robotics and Automation</h3>
+                    <p>Hybrid approaches combining deep reinforcement learning with Digital Twins for robotic applications.</p>
+                    <a href="link-to-reference" target="_blank">Link</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="knowledge-graph">
+            <h2>Knowledge Graph</h2>
+            <div class="x-dt-buttons">
+                <button id="aerospace-dt">Aerospace + Digital Twin</button>
+                <button id="healthcare-dt">Healthcare + Digital Twin</button>
+                <button id="automotive-dt">Automotive Manufacturing + Digital Twin</button>
+                <button id="smart-cities-dt">Smart Cities + Digital Twin</button>
+                <button id="robotics-dt">Robotics + Digital Twin</button>
+            </div>
+            <div id="graph-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <img src="LOGO.png" alt="AI4DE Research Group Logo" class="footer-logo">
+            <p>Powered by AI4DE Research Group, Southern University of Science and Technology</p>
+        </div>
+        <p>&copy; 2023 Digital Twin Research Literature Database. All rights reserved.</p>
+        <p>This project is supported by the <a href="link-to-group-website" target="_blank">AI4DE Research Group at Southern University of Science and Technology</a>. Learn more about us <a href="link-to-group-website" target="_blank">here</a>.</p>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#research-fields">Research Fields</a></li>
+                <li><a href="#featured-research">Featured Research</a></li>
+                <li><a href="#advanced-search">Advanced Search</a></li>
+            </ul>
+        </nav>
+    </footer>
+
+    <button id="back-to-top" class="hidden">↑</button>
+
+    <script src="script.js"></script>
+    <script src="knowledgeGraph.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.scrollTo(0, 1); // Scrolls down slightly on page load
+    });
+    </script>
+</body>
+</html>
